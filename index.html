@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel='stylesheet' href="style.css"></link>
+  <!--<link href="node_modules/bootstrap/dist/css/bootstrap.min.css"></link>
+  <script src="node_modules/jquery/jquery.min.js"></script>
+  <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>-->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+</head>
+<body>
+<div id='app' v-cloak>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="#">Navbar</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="#" v-if='currentUser && currentUser.name'>{{currentUser.name}} <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Dropdown
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <span class="dropdown-item" @click='setToken(parseInt(token))' v-for='token in tokens'>Token: {{token}}</span>
+        </div>
+      </li>
+      <li class="nav-item">
+        <span class="nav-link" @click='showNewPost = !showNewPost'>New Post</span>
+      </li>
+    </ul>
+    <div class="form-inline my-2 my-lg-0">
+      <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+      <button type="button" class="btn btn-outline-success my-2 my-sm-0" >Send</button>
+    </div>
+  </div>
+  </nav>
+  <div class="container" >
+      <div v-if='showNewPost'>
+      <custom-form v-bind:post=newPost v-bind:fn='createPost'></custom-form>
+    </div>
+    <br>
+    <div class="card" v-if='currentUser'>
+      <div class="card-header">
+        I miei posts
+      </div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item" v-for='post in currentUser.posts'>{{post.title}}-{{post.id}}
+            <button type="button" class="btn btn-danger" @click='deletePost(post.id)'>Delete</button>
+        </li>
+      </ul>
+    </div>
+    <br>
+    <div class="card" v-if='currentUser'>
+      <div class="card-header">
+        Users
+      </div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item" v-for='user in users' v-if='user.id !== token'>{{user.name}} {{user.surname}}
+          <div v-if='relationship(user.id)==="friends"'>
+            <span class="badge badge-primary" >
+              {{relationship(user.id)}}
+            </span>
+            <button type="button" class="btn btn-success" @click='showFriendPosts(user.id)'>Show posts</button>
+          </div>
+          <button type="button" class="btn btn-success" v-else-if='relationship(user.id)==="requests"' @click='declineFriendRequest(user.id)'>Decline</button>
+          <button type="button" class="btn btn-success" v-else-if='relationship(user.id)==="pending"' @click='acceptFriendRequest(user.id)'>Accept</button>
+          <button type="button" class="btn btn-success" v-else @click='sendFriendRequest(user.id)'>Send</button>
+        </li>
+      </ul>
+    </div>
+    <br>
+    <div class="card" v-if='currentUser && currentFriend'>
+      <div class="card-header">
+        Post del mio amico
+      </div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item" v-for='post in currentFriend.posts'>{{post.title}}
+        </li>
+      </ul>
+    </div>
+</div>
+
+</div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue-resource"></script>
+<script src="form.js"></script>
+<script src="app.js"></script>
+</html>
